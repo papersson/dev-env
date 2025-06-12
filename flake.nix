@@ -11,10 +11,11 @@
     nix-colors.url       = "github:misterio77/nix-colors";
     ghostty-hm.url       = "github:clo4/ghostty-hm-module";   # unofficial module  :contentReference[oaicite:5]{index=5}
     direnv.url           = "github:nix-community/nix-direnv"; # use_flake helper  :contentReference[oaicite:6]{index=6}
+    ghostty.url          = "github:ghostty-org/ghostty";      # official ghostty flake
   };
 
   outputs = { self, nixpkgs, flake-utils, home-manager
-            , nix-colors, ghostty-hm, direnv, ... }:
+            , nix-colors, ghostty-hm, ghostty, direnv, ... }:
     let
       # No need to define colors here, we'll use colorScheme in the module
     in
@@ -39,11 +40,11 @@
       ### 2. Full user environment with Home-Manager
       homeConfigurations."patrik" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        extraSpecialArgs = { inherit nix-colors ghostty-hm; };
+        extraSpecialArgs = { inherit nix-colors ghostty-hm ghostty; };
         modules = [
 
           ### Core tool set
-          ({ config, pkgs, nix-colors, ... }: {
+          ({ config, pkgs, nix-colors, ghostty, ... }: {
             ### Combine all imports at the top
             imports = [ 
               ghostty-hm.homeModules.default 
@@ -124,6 +125,8 @@
               python312 uv
               git gh fzf ripgrep delta
               du-dust htop bottom
+            ] ++ [
+              ghostty.packages.${pkgs.stdenv.hostPlatform.system}.default
             ];
 
             ### Theming with nix-colors → Starship + Ghostty + tmux
