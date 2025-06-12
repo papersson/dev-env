@@ -8,14 +8,13 @@
       url = "github:nix-community/home-manager/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixvim.url           = "github:nix-community/nixvim";
     nix-colors.url       = "github:misterio77/nix-colors";
     ghostty-hm.url       = "github:clo4/ghostty-hm-module";   # unofficial module  :contentReference[oaicite:5]{index=5}
     direnv.url           = "github:nix-community/nix-direnv"; # use_flake helper  :contentReference[oaicite:6]{index=6}
   };
 
   outputs = { self, nixpkgs, flake-utils, home-manager
-            , nixvim, nix-colors, ghostty-hm, direnv, ... }:
+            , nix-colors, ghostty-hm, direnv, ... }:
     let
       # No need to define colors here, we'll use colorScheme in the module
     in
@@ -40,7 +39,7 @@
       ### 2. Full user environment with Home-Manager
       homeConfigurations."patrik" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        extraSpecialArgs = { inherit nixvim nix-colors ghostty-hm; };
+        extraSpecialArgs = { inherit nix-colors ghostty-hm; };
         modules = [
 
           ### Core tool set
@@ -48,7 +47,6 @@
             ### Combine all imports at the top
             imports = [ 
               ghostty-hm.homeModules.default 
-              nixvim.homeManagerModules.nixvim 
               nix-colors.homeManagerModules.default
             ];
 
@@ -88,14 +86,19 @@
                 else "";
             };
 
-            ### Neovim via nixvim + your LazyVim tree
-            programs.nixvim = {
+            ### Neovim with LazyVim config
+            programs.neovim = {
               enable = true;
+              viAlias = true;
               vimAlias = true;
-              # Load plugins from your repo instead of rebuilding from Nix
-              extraLuaFiles = if builtins.pathExists ./dotfiles/nvim
-                then ./dotfiles/nvim
-                else [];
+              withNodeJs = true;
+              withPython3 = true;
+            };
+            
+            # Link LazyVim config
+            home.file.".config/nvim" = {
+              source = ./dotfiles/nvim;
+              recursive = true;
             };
 
             ### Global packages (CLI + dev)
