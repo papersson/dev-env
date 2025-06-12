@@ -49,7 +49,9 @@
             programs.nushell = {
               enable = true;
               # Optional: point to your own config.nu
-              extraConfig = builtins.readFile (./shells/nu/config.nu or "");
+              extraConfig = if builtins.pathExists ./shells/nu/config.nu 
+                then builtins.readFile ./shells/nu/config.nu 
+                else "";
             };
 
             programs.starship = {
@@ -67,13 +69,17 @@
 
             programs.tmux = {
               enable = true;
-              extraConfig = builtins.readFile ./dotfiles/tmux/.tmux.conf;
+              extraConfig = if builtins.pathExists ./dotfiles/tmux/.tmux.conf
+                then builtins.readFile ./dotfiles/tmux/.tmux.conf
+                else "";
             };
 
             ### Ghostty (GUI terminal on Linux side)
             programs.ghostty = {
               enable = true;
-              settings = builtins.readFile ./dotfiles/ghostty/config;
+              settings = if builtins.pathExists ./dotfiles/ghostty/config
+                then builtins.readFile ./dotfiles/ghostty/config
+                else "";
             };
 
             ### Neovim via nixvim + your LazyVim tree
@@ -81,7 +87,9 @@
               enable = true;
               vimAlias = true;
               # Load plugins from your repo instead of rebuilding from Nix
-              extraLuaFiles = ./dotfiles/nvim;
+              extraLuaFiles = if builtins.pathExists ./dotfiles/nvim
+                then ./dotfiles/nvim
+                else [];
             };
 
             ### Global packages (CLI + dev)
