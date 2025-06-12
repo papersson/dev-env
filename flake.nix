@@ -17,7 +17,7 @@
   outputs = { self, nixpkgs, flake-utils, home-manager
             , nixvim, nix-colors, ghostty-hm, direnv, ... }:
     let
-      colors = nix-colors.lib.colors."gruvbox-dark-medium";
+      # No need to define colors here, we'll use colorScheme in the module
     in
     flake-utils.lib.eachDefaultSystem (system:
     let
@@ -40,15 +40,16 @@
       ### 2. Full user environment with Home-Manager
       homeConfigurations."patrik" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        extraSpecialArgs = { inherit nixvim colors ghostty-hm; };
+        extraSpecialArgs = { inherit nixvim nix-colors ghostty-hm; };
         modules = [
 
           ### Core tool set
-          ({ config, pkgs, ... }: {
+          ({ config, pkgs, nix-colors, ... }: {
             ### Combine all imports at the top
             imports = [ 
               ghostty-hm.homeModules.default 
               nixvim.homeManagerModules.nixvim 
+              nix-colors.homeManagerModules.default
             ];
 
             programs.nushell = {
@@ -107,7 +108,7 @@
             ];
 
             ### Theming with nix-colors → Starship + Ghostty + tmux
-            colorscheme = colors;
+            colorScheme = nix-colors.colorSchemes.gruvbox-dark-medium;
 
             ### Home Manager settings
             home.username = "patrik";
