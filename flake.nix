@@ -9,13 +9,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-colors.url       = "github:misterio77/nix-colors";
-    ghostty-hm.url       = "github:clo4/ghostty-hm-module";   # unofficial module  :contentReference[oaicite:5]{index=5}
     direnv.url           = "github:nix-community/nix-direnv"; # use_flake helper  :contentReference[oaicite:6]{index=6}
-    ghostty.url          = "github:ghostty-org/ghostty";      # official ghostty flake
   };
 
   outputs = { self, nixpkgs, flake-utils, home-manager
-            , nix-colors, ghostty-hm, ghostty, direnv, ... }:
+            , nix-colors, direnv, ... }:
     let
       # No need to define colors here, we'll use colorScheme in the module
     in
@@ -40,14 +38,13 @@
       ### 2. Full user environment with Home-Manager
       homeConfigurations."patrik" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        extraSpecialArgs = { inherit nix-colors ghostty-hm ghostty; };
+        extraSpecialArgs = { inherit nix-colors; };
         modules = [
 
           ### Core tool set
-          ({ config, pkgs, nix-colors, ghostty, ... }: {
+          ({ config, pkgs, nix-colors, ... }: {
             ### Combine all imports at the top
             imports = [ 
-              ghostty-hm.homeModules.default 
               nix-colors.homeManagerModules.default
             ];
 
@@ -79,30 +76,6 @@
                 else "";
             };
 
-            ### Ghostty (GUI terminal on Linux side)
-            programs.ghostty = {
-              enable = true;
-              settings = {
-                background-opacity = 0.9;
-                background-blur-radius = 20;
-                window-theme = "dark";
-                theme = "GruvboxDark";
-                window-padding-x = 10;
-                window-padding-y = 10;
-                cursor-style = "block";
-                cursor-color = "#ffffff";
-                mouse-hide-while-typing = true;
-                copy-on-select = true;
-                keybind = [
-                  "ctrl+h=goto_split:left"
-                  "ctrl+j=goto_split:bottom"
-                  "ctrl+k=goto_split:top"
-                  "ctrl+l=goto_split:right"
-                  "shift+enter=text:\\n"
-                ];
-              };
-            };
-
             ### Neovim with LazyVim config
             programs.neovim = {
               enable = true;
@@ -125,8 +98,6 @@
               python312 uv
               git gh fzf ripgrep delta
               du-dust htop bottom
-            ] ++ [
-              ghostty.packages.${pkgs.stdenv.hostPlatform.system}.default
             ];
 
             ### Theming with nix-colors → Starship + Ghostty + tmux
