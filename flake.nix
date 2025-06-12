@@ -133,7 +133,8 @@
             home.username = "patrik";
             home.homeDirectory = "/home/patrik";
             home.stateVersion = "24.05";  # Please read the comment before changing.
-            programs.home-manager.enable = true;
+            # Don't include home-manager in the profile to avoid conflicts
+            # programs.home-manager.enable = true;
           })
 
         ];
