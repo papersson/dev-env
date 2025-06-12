@@ -40,10 +40,16 @@
 
           ### Core tool set
           ({ config, pkgs, ... }: {
+            ### Combine all imports at the top
+            imports = [ 
+              ghostty-hm.homeModules.default 
+              nixvim.homeManagerModules.nixvim 
+            ];
+
             programs.nushell = {
               enable = true;
               # Optional: point to your own config.nu
-              extraConfig = builtins.readFile ./shells/nu/config.nu or "";
+              extraConfig = builtins.readFile (./shells/nu/config.nu or "");
             };
 
             programs.starship = {
@@ -65,14 +71,12 @@
             };
 
             ### Ghostty (GUI terminal on Linux side)
-            imports = [ ghostty-hm.homeModules.default ];
             programs.ghostty = {
               enable = true;
               settings = builtins.readFile ./dotfiles/ghostty/config;
             };
 
             ### Neovim via nixvim + your LazyVim tree
-            imports = [ nixvim.homeManagerModules.nixvim ];
             programs.nixvim = {
               enable = true;
               vimAlias = true;
